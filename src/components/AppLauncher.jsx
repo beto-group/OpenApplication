@@ -40,6 +40,7 @@ function AppLauncher(props) {
                     const app = apps[i];
                     const destPath = path.join(cacheDir, app.name + '.png');
                     
+                    const relativeIconPath = path.join(props.folderPath, 'data', 'cache', 'icons', app.name + '.png');
                     let exists = false;
                     try {
                         await fs.promises.access(destPath);
@@ -47,7 +48,7 @@ function AppLauncher(props) {
                     } catch (e) {}
 
                     if (exists) {
-                        const resourceUrl = dc.app.vault.adapter.getResourcePath(destPath);
+                        const resourceUrl = dc.app.vault.adapter.getResourcePath(relativeIconPath);
                         setIcons(function (prev) {
                             return Object.assign({}, prev, { [app.path]: resourceUrl });
                         });
@@ -58,7 +59,7 @@ function AppLauncher(props) {
                     if (srcIconPath) {
                         try {
                             await executeCommand('sips', ['-s', 'format', 'png', '-z', '64', '64', srcIconPath, '--out', destPath]);
-                            const resourceUrl = dc.app.vault.adapter.getResourcePath(destPath);
+                            const resourceUrl = dc.app.vault.adapter.getResourcePath(relativeIconPath);
                             setIcons(function (prev) {
                                 return Object.assign({}, prev, { [app.path]: resourceUrl });
                             });
