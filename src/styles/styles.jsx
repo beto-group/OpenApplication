@@ -108,6 +108,13 @@ const STYLES = {
         fontWeight: '700',
         color: 'var(--text-muted)'
     },
+    appIconImg: {
+        width: '44px',
+        height: '44px',
+        marginBottom: '10px',
+        objectFit: 'contain',
+        pointerEvents: 'none'
+    },
     appName: {
         fontSize: '12px',
         fontWeight: '500',

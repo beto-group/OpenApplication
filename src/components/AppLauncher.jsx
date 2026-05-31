@@ -15,10 +15,102 @@ function AppLauncher(props) {
     const [isAdmin, setIsAdmin] = useState(false);
     const [loading, setLoading] = useState(true);
     const [statusMsg, setStatusMsg] = useState('');
+    const [icons, setIcons] = useState({});
 
     useEffect(function () {
         loadApps();
     }, []);
+
+    // Extract icons in background
+    useEffect(function () {
+        if (apps.length === 0 || !dc.app) return;
+
+        let active = true;
+        async function extractAllIcons() {
+            try {
+                const basePath = dc.app.vault.adapter.getBasePath();
+                const cacheDir = path.join(basePath, props.folderPath, 'data', 'cache', 'icons');
+                
+                try {
+                    await fs.promises.mkdir(cacheDir, { recursive: true });
+                } catch (e) {}
+
+                for (let i = 0; i < apps.length; i++) {
+                    if (!active) break;
+                    const app = apps[i];
+                    const destPath = path.join(cacheDir, app.name + '.png');
+                    
+                    let exists = false;
+                    try {
+                        await fs.promises.access(destPath);
+                        exists = true;
+                    } catch (e) {}
+
+                    if (exists) {
+                        const resourceUrl = dc.app.vault.adapter.getResourcePath(destPath);
+                        setIcons(function (prev) {
+                            return Object.assign({}, prev, { [app.path]: resourceUrl });
+                        });
+                        continue;
+                    }
+
+                    const srcIconPath = getAppIconPath(app.path);
+                    if (srcIconPath) {
+                        try {
+                            await executeCommand('sips', ['-s', 'format', 'png', '-z', '64', '64', srcIconPath, '--out', destPath]);
+                            const resourceUrl = dc.app.vault.adapter.getResourcePath(destPath);
+                            setIcons(function (prev) {
+                                return Object.assign({}, prev, { [app.path]: resourceUrl });
+                            });
+                        } catch (err) {
+                            // ignore sips errors gracefully
+                        }
+                    }
+                }
+            } catch (err) {
+                console.error("Open Application: Icon background extraction error:", err);
+            }
+        }
+
+        extractAllIcons();
+        return function () { active = false; };
+    }, [apps, props.folderPath]);
+
+    function getAppIconPath(appPath) {
+        try {
+            const infoPath = path.join(appPath, 'Contents', 'Info');
+            let iconName = '';
+            try {
+                const { execSync } = require('child_process');
+                iconName = execSync(`defaults read "${infoPath}" CFBundleIconFile`, { encoding: 'utf8' }).trim();
+            } catch (e) {}
+
+            if (iconName) {
+                if (!iconName.endsWith('.icns')) {
+                    const testPath = path.join(appPath, 'Contents', 'Resources', iconName + '.icns');
+                    if (fs.existsSync(testPath)) return testPath;
+                } else {
+                    const testPath = path.join(appPath, 'Contents', 'Resources', iconName);
+                    if (fs.existsSync(testPath)) return testPath;
+                }
+                const tiffPath = path.join(appPath, 'Contents', 'Resources', iconName.replace('.icns', '') + '.tiff');
+                if (fs.existsSync(tiffPath)) return tiffPath;
+            }
+
+            const resourcesPath = path.join(appPath, 'Contents', 'Resources');
+            if (fs.existsSync(resourcesPath)) {
+                const files = fs.readdirSync(resourcesPath);
+                const icnsFile = files.find(function (f) { return f.endsWith('.icns'); });
+                if (icnsFile) return path.join(resourcesPath, icnsFile);
+                
+                const tiffFile = files.find(function (f) { return f.endsWith('.tiff'); });
+                if (tiffFile) return path.join(resourcesPath, tiffFile);
+            }
+        } catch (err) {
+            console.error("Open Application: Error finding icon for " + appPath, err);
+        }
+        return null;
+    }
 
     async function loadApps() {
         setLoading(true);
@@ -82,6 +174,14 @@ function AppLauncher(props) {
         return apps.filter(function (app) { return app.name.toLowerCase().includes(q); });
     }, [apps, search]);
 
+    const enrichedApps = useMemo(function () {
+        return filteredApps.map(function (app) {
+            return Object.assign({}, app, {
+                iconUrl: icons[app.path] || null
+            });
+        });
+    }, [filteredApps, icons]);
+
     const adminBtnStyle = Object.assign(
         {},
         styles.controlBtn,
@@ -139,7 +239,7 @@ function AppLauncher(props) {
                     </div>
                 ) : (
                     <div style={styles.grid}>
-                        {filteredApps.map(function (app) {
+                        {enrichedApps.map(function (app) {
                             return (
                                 <AppCard
                                     key={app.path}
@@ -153,7 +253,7 @@ function AppLauncher(props) {
                     </div>
                 )}
 
-                {!loading && filteredApps.length === 0 && (
+                {!loading && enrichedApps.length === 0 && (
                     <div style={styles.emptyState}>No applications found.</div>
                 )}
             </div>

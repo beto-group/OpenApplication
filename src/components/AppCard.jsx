@@ -31,7 +31,11 @@ function AppCard(props) {
             onClick={handleClick}
             title={app.name}
         >
-            <div style={styles.appIcon}>{letter}</div>
+            {app.iconUrl ? (
+                <img src={app.iconUrl} style={styles.appIconImg} alt="" />
+            ) : (
+                <div style={styles.appIcon}>{letter}</div>
+            )}
             <div style={styles.appName}>{app.name}</div>
 
             {loading && (

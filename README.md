@@ -1,3 +1,4 @@
+
 <div align="center">
   <a name="readme-top"></a>
   <img src="https://raw.githubusercontent.com/beto-group/beto.assets/main/BETO.logo.animated.svg?raw=true" alt="LOGO" width="160">
@@ -55,7 +56,7 @@ Welcome to **Open Application**, a lightweight Obsidian utility component powere
 | File | Description |
 | :--- | :--- |
 | **[`OPEN APPLICATION.md`](OPEN%20APPLICATION.md)** | The main entry point leaf designed to be loaded inside Obsidian panes. |
-| **[`src/index.jsx`](src/index.jsx)** | Main bootstrap application loader and polling invalidation daemon. |
+| **[`src/index.jsx`](_RESOURCES/DATACORE/_DONE/OPEN%20APPLICATION/src/index.jsx)** | Main bootstrap application loader and polling invalidation daemon. |
 | **[`src/App.jsx`](src/App.jsx)** | The view coordinator loading dependency modules. |
 | **[`src/components/AppLauncher.jsx`](src/components/AppLauncher.jsx)** | The core launcher UI with search, admin toggle, and app grid. |
 | **[`src/components/AppCard.jsx`](src/components/AppCard.jsx)** | Individual app card tile with hover state and loading overlay. |
