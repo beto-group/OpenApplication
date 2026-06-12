@@ -3,7 +3,7 @@ author: beto.group
 contributor: []
 version: 1.0.0
 id: open-application-583
-name: OPEN APPLICATION
+name: OpenApplication
 description: A macOS application launcher embedded inside Obsidian. Reads /Applications, renders a filterable grid of installed apps, and launches them natively — with optional admin escalation via osascript.
 status: stable
 complexity: simple
@@ -17,8 +17,8 @@ repository:
   - https://github.com/beto-group/OpenApplication
 missing: []
 resources:
-  - assets/open_application.webp
-  - assets/openapplication.clip.gif
+  - assets/image/preview_1.webp
+  - assets/videos/preview.gif
 type: DatacoreComponent
 target: Datacore
 security:

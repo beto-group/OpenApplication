@@ -3,6 +3,7 @@
  * Bootstrap loader with HMR polling daemon and immersive status bar suppressor.
  */
 async function View({ folderPath, isInception, dc, ...props }) {
+    dc.currentFolderPath = folderPath;
     const STYLE_ID = "impeccable-status-openapplication";
 
     const Agent = {

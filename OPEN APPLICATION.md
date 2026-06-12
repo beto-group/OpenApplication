@@ -4,8 +4,8 @@ cssclasses:
 ---
 
 ```datacorejsx
-const activeFile = dc.resolvePath("OPEN APPLICATION/src/index.jsx");
-const folderPath = activeFile.substring(0, activeFile.lastIndexOf('/src'));
-const { View } = await dc.require(activeFile);
+const currentFilePath = dc.useCurrentPath();
+const folderPath = currentFilePath ? currentFilePath.substring(0, currentFilePath.lastIndexOf("/")) : "";
+const { View } = await dc.require(folderPath + "/src/index.jsx");
 return await View({ folderPath, dc });
 ```
